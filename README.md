@@ -73,7 +73,7 @@ commands calculates evaluation metrics twice.
 Train the model first, then start Streamlit:
 
 ```powershell
-streamlit run app/streamlit_app.py
+streamlit run streamlit_app.py
 ```
 
 The app prompts for tyre age, fuel proxy, compound, driver, and event, then
@@ -94,6 +94,34 @@ shows a predicted lap time and SHAP waterfall.
 - Cleaning retains the configured compounds and removes pit, non-green,
   first-lap, and per-driver/per-race outlier laps. Review those assumptions
   when extending the dataset to other seasons or conditions.
+
+## Cross-validation results
+
+The following race-grouped cross-validation run used 10 races: 8 for training
+and 2 held out in each fold.
+
+| Fold | Train races | Valid races | MAE (s) | RMSE (s) | R² |
+|---:|---:|---:|---:|---:|---:|
+| 1 | 8 | 2 | 14.654 | 14.793 | -84.729 |
+| 2 | 8 | 2 | 8.545 | 9.030 | 0.117 |
+| 3 | 8 | 2 | 11.748 | 12.078 | -69.741 |
+| 4 | 8 | 2 | 4.756 | 5.688 | -15.866 |
+| 5 | 8 | 2 | 10.563 | 11.948 | -25.057 |
+
+| Out-of-fold metric | Result |
+|---|---:|
+| MAE | 9.860 s |
+| RMSE | 10.956 s |
+| R² | -0.772 |
+| Baseline MAE | 12.176 s |
+| MAE improvement over baseline | 19.0% |
+
+The model's out-of-fold MAE is lower than the median baseline's, but its
+negative out-of-fold R² indicates that its predictions explain the held-out
+lap-time variation poorly overall. Fold-level R² is especially volatile here
+because each fold validates on only two races. Treat the MAE improvement as a
+promising result rather than evidence of reliable generalization; evaluate on
+more held-out races before drawing a stronger conclusion.
 
 ## Tests
 
